@@ -30,6 +30,7 @@ dim (testing)
 Training and testing data set had 159 variables, training data had 19622 observations while testing data had 20 observations.
 
 Data cleaning:
+
 Here we remove the missing values and null values.
 ```{r}
 sum(complete.cases(training))
@@ -50,6 +51,7 @@ dim(test2)
 After data cleaning, training set contains 19622 observations and 58 variables, while testing set contains 20 observations and 58 variables.
 
 Data Splitting:
+
 Split training set into training and testing, 60% for training, 40% for cross validation.
 
 ```{r}
@@ -63,6 +65,7 @@ dim(crossValidation)
 
 ```
 Modeling:
+
 Use training part do modeling. 
 "classe" is the factor to define activity type.
 
@@ -75,6 +78,7 @@ print (modFit$finalModel)
 ```
 
 Accuracy:
+
 Compute accuracy in training set and cross validation set.
 
 ```{r}
