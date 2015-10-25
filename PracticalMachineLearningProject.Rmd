@@ -105,7 +105,7 @@ summary(testPre)
 According to result, the 20 cases, 7 are class A, 8 are class B, 1 is class C, 1 is class D, 3 are class E.
 
 # Appendix:
-# plot desition tree
+plot desition tree
 
 ```{r}
 
