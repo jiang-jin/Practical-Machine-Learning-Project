@@ -12,7 +12,7 @@ Data here collected accelerometers on the belt, forarm, arm and dumbell when the
 The project here is to use data perform prediction of how they did the exercise.
 
 # Data preprocessing & Modeling    
-Load Data
+Load Data:
 ```{r}
 setwd ("~/Desktop/WorkDirectory/Practical-Machine-Learning-Project")
 library(caret)
@@ -29,7 +29,7 @@ dim (testing)
 ```
 Training and testing data set had 159 variables, training data had 19622 observations while testing data had 20 observations.
 
-Data cleaning
+Data cleaning:
 Here we remove the missing values and null values.
 ```{r}
 sum(complete.cases(training))
@@ -49,7 +49,7 @@ dim(test2)
 ```
 After data cleaning, training set contains 19622 observations and 58 variables, while testing set contains 20 observations and 58 variables.
 
-Data Splitting
+Data Splitting:
 Split training set into training and testing, 60% for training, 40% for cross validation.
 
 ```{r}
@@ -62,7 +62,7 @@ dim(train)
 dim(crossValidation)
 
 ```
-Modeling
+Modeling:
 Use training part do modeling. 
 "classe" is the factor to define activity type.
 
@@ -71,12 +71,10 @@ library(caret)
 modFit <- train(classe ~., method="rf", data=train, trControl=trainControl(method='cv'), number=5, allowParallel=TRUE )
 print (modFit$finalModel)
 
-library(rattle)
-fancyRpartPlot (modFit$finalModel)
 
 ```
 
-Accuracy
+Accuracy:
 Compute accuracy in training set and cross validation set.
 
 ```{r}
@@ -106,7 +104,11 @@ summary(testPre)
 # Result:
 According to result, the 20 cases, 7 are class A, 8 are class B, 1 is class C, 1 is class D, 3 are class E.
 
-
+# Appendix:
+# plot desition tree
+modFit2 <- rpart(classe ~ ., data=train, method="class")
+library(rattle)
+fancyRpartPlot(modFit2)
 
 
 

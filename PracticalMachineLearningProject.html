@@ -63,7 +63,10 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <h1>Introduction</h1>
 <p>Modern portable devices like Jawbone Up, Nike FuelBand and Fitbit help people collecting a large amount of data about activity. A group of enthusiasts who take measurements about themselves regularly to improve their health, many of them trends to focus on how much of a particular activity they do, instead of how well they do these activities.</p>
 <p>Data here collected accelerometers on the belt, forarm, arm and dumbell when the testers were asked to perform barbell lifts correctly and incorrectly in 5 different ways.<br />The project here is to use data perform prediction of how they did the exercise.</p>
-<p>Data preprocessing:<br />1. Load Data</p>
+</div>
+<div id="data-preprocessing-modeling" class="section level1">
+<h1>Data preprocessing &amp; Modeling</h1>
+<p>Load Data:</p>
 <pre class="r"><code>setwd (&quot;~/Desktop/WorkDirectory/Practical-Machine-Learning-Project&quot;)
 library(caret)</code></pre>
 <pre><code>## Loading required package: lattice
@@ -72,6 +75,11 @@ library(caret)</code></pre>
 library(randomForest)</code></pre>
 <pre><code>## randomForest 4.6-12
 ## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre class="r"><code>library(rattle)</code></pre>
+<pre><code>## Loading required package: RGtk2
+## Rattle: A free graphical interface for data mining with R.
+## Version 3.5.0 Copyright (c) 2006-2015 Togaware Pty Ltd.
+## Type 'rattle()' to shake, rattle, and roll your data.</code></pre>
 <pre class="r"><code># load data
 training &lt;- read.csv(&quot;./data/pml-training.csv&quot;, row.names=1)
 dim (training)</code></pre>
@@ -80,9 +88,7 @@ dim (training)</code></pre>
 dim (testing)</code></pre>
 <pre><code>## [1]  20 159</code></pre>
 <p>Training and testing data set had 159 variables, training data had 19622 observations while testing data had 20 observations.</p>
-<ol start="2" style="list-style-type: decimal">
-<li>Data cleaning Here we remove the missing values and null values.</li>
-</ol>
+<p>Data cleaning: Here we remove the missing values and null values.</p>
 <pre class="r"><code>sum(complete.cases(training))</code></pre>
 <pre><code>## [1] 406</code></pre>
 <pre class="r"><code>training1 &lt;- training[,colSums (is.na(training))==0]
@@ -100,9 +106,7 @@ test2 &lt;- testing1[, !nsv1$nzv]
 dim(test2)</code></pre>
 <pre><code>## [1] 20 58</code></pre>
 <p>After data cleaning, training set contains 19622 observations and 58 variables, while testing set contains 20 observations and 58 variables.</p>
-<ol start="3" style="list-style-type: decimal">
-<li>Data Splitting Split training set into training and testing, 60% for training, 40% for cross validation.</li>
-</ol>
+<p>Data Splitting: Split training set into training and testing, 60% for training, 40% for cross validation.</p>
 <pre class="r"><code>inTrain &lt;- createDataPartition(y=train2$classe, p=0.6, list=FALSE)
 train &lt;- train2 [inTrain,]
 crossValidation &lt;- train2[-inTrain,]
@@ -111,9 +115,7 @@ dim(train)</code></pre>
 <pre><code>## [1] 11776    58</code></pre>
 <pre class="r"><code>dim(crossValidation)</code></pre>
 <pre><code>## [1] 7846   58</code></pre>
-<ol start="4" style="list-style-type: decimal">
-<li>Modeling Use training part do modeling. “classe” is the factor to define activity type.</li>
-</ol>
+<p>Modeling: Use training part do modeling. “classe” is the factor to define activity type.</p>
 <pre class="r"><code>library(caret)
 modFit &lt;- train(classe ~., method=&quot;rf&quot;, data=train, trControl=trainControl(method='cv'), number=5, allowParallel=TRUE )
 print (modFit$finalModel)</code></pre>
@@ -124,19 +126,15 @@ print (modFit$finalModel)</code></pre>
 ##                      Number of trees: 500
 ## No. of variables tried at each split: 40
 ## 
-##         OOB estimate of  error rate: 0.12%
+##         OOB estimate of  error rate: 0.09%
 ## Confusion matrix:
 ##      A    B    C    D    E  class.error
 ## A 3348    0    0    0    0 0.0000000000
-## B    2 2276    1    0    0 0.0013163668
-## C    0    3 2050    1    0 0.0019474197
-## D    0    0    5 1924    1 0.0031088083
-## E    0    0    0    1 2164 0.0004618938</code></pre>
-<pre class="r"><code># library(rattle)
-# fancyRpartPlot (modFit$finalModel)</code></pre>
-<ol start="5" style="list-style-type: decimal">
-<li>Accuracy Compute accuracy in training set and cross validation set.</li>
-</ol>
+## B    0 2277    2    0    0 0.0008775779
+## C    0    0 2053    1    0 0.0004868549
+## D    0    0    2 1925    3 0.0025906736
+## E    0    0    0    3 2162 0.0013856813</code></pre>
+<p>Accuracy: Compute accuracy in training set and cross validation set.</p>
 <pre class="r"><code># train set
 trainPre &lt;- predict(modFit, train)
 Matrix1 &lt;- confusionMatrix (trainPre, train$classe)
@@ -180,37 +178,38 @@ Matrix2</code></pre>
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 2232    0    0    0    0
-##          B    0 1518    0    0    0
-##          C    0    0 1368    1    0
-##          D    0    0    0 1284    0
-##          E    0    0    0    1 1442
+##          A 2232    1    0    0    0
+##          B    0 1517    3    0    0
+##          C    0    0 1363    2    0
+##          D    0    0    2 1284    1
+##          E    0    0    0    0 1441
 ## 
 ## Overall Statistics
-##                                      
-##                Accuracy : 0.9997     
-##                  95% CI : (0.9991, 1)
-##     No Information Rate : 0.2845     
-##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16  
-##                                      
-##                   Kappa : 0.9997     
-##  Mcnemar's Test P-Value : NA         
+##                                           
+##                Accuracy : 0.9989          
+##                  95% CI : (0.9978, 0.9995)
+##     No Information Rate : 0.2845          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.9985          
+##  Mcnemar's Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            1.0000   1.0000   1.0000   0.9984   1.0000
-## Specificity            1.0000   1.0000   0.9998   1.0000   0.9998
-## Pos Pred Value         1.0000   1.0000   0.9993   1.0000   0.9993
-## Neg Pred Value         1.0000   1.0000   1.0000   0.9997   1.0000
+## Sensitivity            1.0000   0.9993   0.9963   0.9984   0.9993
+## Specificity            0.9998   0.9995   0.9997   0.9995   1.0000
+## Pos Pred Value         0.9996   0.9980   0.9985   0.9977   1.0000
+## Neg Pred Value         1.0000   0.9998   0.9992   0.9997   0.9998
 ## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
-## Detection Rate         0.2845   0.1935   0.1744   0.1637   0.1838
-## Detection Prevalence   0.2845   0.1935   0.1745   0.1637   0.1839
-## Balanced Accuracy      1.0000   1.0000   0.9999   0.9992   0.9999</code></pre>
-<p>From the tet we can see the accuracy in training set is 1, P-value &lt;0.05. Accuracy in cross validation set is 0.997, P-value &lt;0.05.</p>
-<ol start="6" style="list-style-type: decimal">
-<li>Test’s prediction Here we use modFit to predict testing data set.</li>
-</ol>
+## Detection Rate         0.2845   0.1933   0.1737   0.1637   0.1837
+## Detection Prevalence   0.2846   0.1937   0.1740   0.1640   0.1837
+## Balanced Accuracy      0.9999   0.9994   0.9980   0.9990   0.9997</code></pre>
+<p>From the tet we can see the accuracy in training set is 1, P-value &lt;0.05. Accuracy in cross validation set is 0.997, P-value &lt;0.05. The accuracy is very high in method “rf”.</p>
+</div>
+<div id="tests-prediction" class="section level1">
+<h1>Test’s prediction</h1>
+<p>Here we use modFit to predict testing data set.</p>
 <pre class="r"><code>testPre &lt;- predict (modFit, test2)
 testPre</code></pre>
 <pre><code>##  [1] B A B A A E D B A A B C B A E E A B B B
@@ -218,6 +217,9 @@ testPre</code></pre>
 <pre class="r"><code>summary(testPre)</code></pre>
 <pre><code>## A B C D E 
 ## 7 8 1 1 3</code></pre>
+</div>
+<div id="result" class="section level1">
+<h1>Result:</h1>
 <p>According to result, the 20 cases, 7 are class A, 8 are class B, 1 is class C, 1 is class D, 3 are class E.</p>
 </div>
 
