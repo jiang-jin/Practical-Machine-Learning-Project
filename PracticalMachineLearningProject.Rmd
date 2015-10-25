@@ -1,0 +1,111 @@
+---
+title: "Practical Machine Learning Project"
+author: "Jiang Jin"
+date: "October 24, 2015"
+output: html_document
+---
+
+# Introduction    
+Modern portable devices like Jawbone Up, Nike FuelBand and Fitbit help people collecting a large amount of data about activity. A group of enthusiasts who take measurements about themselves regularly to improve their health, many of them trends to focus on how much of a particular activity they do, instead of how well they do these activities.         
+
+Data here collected accelerometers on the belt, forarm, arm and dumbell when the testers were asked to perform barbell lifts correctly and incorrectly in 5 different ways.    
+The project here is to use data perform prediction of how they did the exercise.
+
+Data preprocessing:     
+1. Load Data
+```{r}
+setwd ("~/Desktop/WorkDirectory/Practical-Machine-Learning-Project")
+library(caret)
+library(rpart)
+library(randomForest)
+# load data
+training <- read.csv("./data/pml-training.csv", row.names=1)
+dim (training)
+
+testing <- read.csv("./data/pml-testing.csv", row.names=1)
+dim (testing)
+
+```
+Training and testing data set had 159 variables, training data had 19622 observations while testing data had 20 observations.
+
+2. Data cleaning
+Here we remove the missing values and null values.
+```{r}
+sum(complete.cases(training))
+training1 <- training[,colSums (is.na(training))==0]
+testing1 <- testing [,colSums (is.na(testing))==0]
+dim (training1); dim (testing1)
+
+# remove zero value
+nsv <- nearZeroVar(training1, saveMetrics = TRUE)
+train2 <- training1[,!nsv$nzv]
+dim(train2)
+
+nsv1 <- nearZeroVar (testing1, saveMetrics = TRUE)
+test2 <- testing1[, !nsv1$nzv]
+dim(test2)
+
+```
+After data cleaning, training set contains 19622 observations and 58 variables, while testing set contains 20 observations and 58 variables.
+
+
+3. Data Splitting
+Split training set into training and testing, 60% for training, 40% for cross validation.
+
+```{r}
+
+inTrain <- createDataPartition(y=train2$classe, p=0.6, list=FALSE)
+train <- train2 [inTrain,]
+crossValidation <- train2[-inTrain,]
+
+dim(train)
+dim(crossValidation)
+
+```
+4. Modeling
+Use training part do modeling. 
+"classe" is the factor to define activity type.
+
+```{r}
+library(caret)
+modFit <- train(classe ~., method="rf", data=train, trControl=trainControl(method='cv'), number=5, allowParallel=TRUE )
+print (modFit$finalModel)
+
+# library(rattle)
+# fancyRpartPlot (modFit$finalModel)
+
+```
+
+5. Accuracy
+Compute accuracy in training set and cross validation set.
+
+```{r}
+# train set
+trainPre <- predict(modFit, train)
+Matrix1 <- confusionMatrix (trainPre, train$classe)
+Matrix1
+# cross validation set
+cvPre <- predict(modFit, crossValidation)
+Matrix2 <- confusionMatrix (cvPre, crossValidation$classe)
+Matrix2
+```
+From the tet we can see the accuracy in training set is 1, P-value <0.05. 
+Accuracy in cross validation set is 0.997, P-value <0.05.
+
+6. Test's prediction
+Here we use modFit to predict testing data set.
+
+```{r}
+testPre <- predict (modFit, test2)
+testPre
+summary(testPre)
+
+```
+According to result, the 20 cases, 7 are class A, 8 are class B, 1 is class C, 1 is class D, 3 are class E.
+
+
+
+
+
+
+
