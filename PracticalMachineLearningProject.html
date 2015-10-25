@@ -64,7 +64,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <p>Modern portable devices like Jawbone Up, Nike FuelBand and Fitbit help people collecting a large amount of data about activity. A group of enthusiasts who take measurements about themselves regularly to improve their health, many of them trends to focus on how much of a particular activity they do, instead of how well they do these activities.</p>
 <p>Data here collected accelerometers on the belt, forarm, arm and dumbell when the testers were asked to perform barbell lifts correctly and incorrectly in 5 different ways.<br />The project here is to use data perform prediction of how they did the exercise.</p>
 <p>Data preprocessing:<br />1. Load Data</p>
-<pre class="r"><code>setwd (&quot;~/Desktop/WorkDirectory/PracticalMachineLearning&quot;)
+<pre class="r"><code>setwd (&quot;~/Desktop/WorkDirectory/Practical-Machine-Learning-Project&quot;)
 library(caret)</code></pre>
 <pre><code>## Loading required package: lattice
 ## Loading required package: ggplot2</code></pre>
@@ -103,9 +103,7 @@ dim(test2)</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li>Data Splitting Split training set into training and testing, 60% for training, 40% for cross validation.</li>
 </ol>
-<pre class="r"><code>set.seed(123) # for future use
-
-inTrain &lt;- createDataPartition(y=train2$classe, p=0.6, list=FALSE)
+<pre class="r"><code>inTrain &lt;- createDataPartition(y=train2$classe, p=0.6, list=FALSE)
 train &lt;- train2 [inTrain,]
 crossValidation &lt;- train2[-inTrain,]
 
@@ -114,32 +112,113 @@ dim(train)</code></pre>
 <pre class="r"><code>dim(crossValidation)</code></pre>
 <pre><code>## [1] 7846   58</code></pre>
 <ol start="4" style="list-style-type: decimal">
-<li>Modeling &amp; Accuracy Use training part do modeling.</li>
+<li>Modeling Use training part do modeling. “classe” is the factor to define activity type.</li>
 </ol>
 <pre class="r"><code>library(caret)
 modFit &lt;- train(classe ~., method=&quot;rf&quot;, data=train, trControl=trainControl(method='cv'), number=5, allowParallel=TRUE )
-modFit</code></pre>
-<pre><code>## Random Forest 
+print (modFit$finalModel)</code></pre>
+<pre><code>## 
+## Call:
+##  randomForest(x = x, y = y, mtry = param$mtry, number = 5, allowParallel = TRUE) 
+##                Type of random forest: classification
+##                      Number of trees: 500
+## No. of variables tried at each split: 40
 ## 
-## 11776 samples
-##    57 predictor
-##     5 classes: 'A', 'B', 'C', 'D', 'E' 
+##         OOB estimate of  error rate: 0.12%
+## Confusion matrix:
+##      A    B    C    D    E  class.error
+## A 3348    0    0    0    0 0.0000000000
+## B    2 2276    1    0    0 0.0013163668
+## C    0    3 2050    1    0 0.0019474197
+## D    0    0    5 1924    1 0.0031088083
+## E    0    0    0    1 2164 0.0004618938</code></pre>
+<pre class="r"><code># library(rattle)
+# fancyRpartPlot (modFit$finalModel)</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>Accuracy Compute accuracy in training set and cross validation set.</li>
+</ol>
+<pre class="r"><code># train set
+trainPre &lt;- predict(modFit, train)
+Matrix1 &lt;- confusionMatrix (trainPre, train$classe)
+Matrix1</code></pre>
+<pre><code>## Confusion Matrix and Statistics
 ## 
-## No pre-processing
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 10599, 10598, 10599, 10598, 10598, 10598, ... 
-## Resampling results across tuning parameters:
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 3348    0    0    0    0
+##          B    0 2279    0    0    0
+##          C    0    0 2054    0    0
+##          D    0    0    0 1930    0
+##          E    0    0    0    0 2165
 ## 
-##   mtry  Accuracy   Kappa      Accuracy SD  Kappa SD   
-##    2    0.9871770  0.9837774  0.004170005  0.005275474
-##   40    0.9987259  0.9983884  0.001343186  0.001699032
-##   79    0.9983867  0.9979594  0.001016490  0.001285764
+## Overall Statistics
+##                                      
+##                Accuracy : 1          
+##                  95% CI : (0.9997, 1)
+##     No Information Rate : 0.2843     
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16  
+##                                      
+##                   Kappa : 1          
+##  Mcnemar's Test P-Value : NA         
 ## 
-## Accuracy was used to select the optimal model using  the largest value.
-## The final value used for the model was mtry = 40.</code></pre>
-<pre class="r"><code># then compute accuracy in training set and cross validation set.
-
-trainPre &lt;- predict(modFit, train)</code></pre>
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            1.0000   1.0000   1.0000   1.0000   1.0000
+## Specificity            1.0000   1.0000   1.0000   1.0000   1.0000
+## Pos Pred Value         1.0000   1.0000   1.0000   1.0000   1.0000
+## Neg Pred Value         1.0000   1.0000   1.0000   1.0000   1.0000
+## Prevalence             0.2843   0.1935   0.1744   0.1639   0.1838
+## Detection Rate         0.2843   0.1935   0.1744   0.1639   0.1838
+## Detection Prevalence   0.2843   0.1935   0.1744   0.1639   0.1838
+## Balanced Accuracy      1.0000   1.0000   1.0000   1.0000   1.0000</code></pre>
+<pre class="r"><code># cross validation set
+cvPre &lt;- predict(modFit, crossValidation)
+Matrix2 &lt;- confusionMatrix (cvPre, crossValidation$classe)
+Matrix2</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 2232    0    0    0    0
+##          B    0 1518    0    0    0
+##          C    0    0 1368    1    0
+##          D    0    0    0 1284    0
+##          E    0    0    0    1 1442
+## 
+## Overall Statistics
+##                                      
+##                Accuracy : 0.9997     
+##                  95% CI : (0.9991, 1)
+##     No Information Rate : 0.2845     
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16  
+##                                      
+##                   Kappa : 0.9997     
+##  Mcnemar's Test P-Value : NA         
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            1.0000   1.0000   1.0000   0.9984   1.0000
+## Specificity            1.0000   1.0000   0.9998   1.0000   0.9998
+## Pos Pred Value         1.0000   1.0000   0.9993   1.0000   0.9993
+## Neg Pred Value         1.0000   1.0000   1.0000   0.9997   1.0000
+## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
+## Detection Rate         0.2845   0.1935   0.1744   0.1637   0.1838
+## Detection Prevalence   0.2845   0.1935   0.1745   0.1637   0.1839
+## Balanced Accuracy      1.0000   1.0000   0.9999   0.9992   0.9999</code></pre>
+<p>From the tet we can see the accuracy in training set is 1, P-value &lt;0.05. Accuracy in cross validation set is 0.997, P-value &lt;0.05.</p>
+<ol start="6" style="list-style-type: decimal">
+<li>Test’s prediction Here we use modFit to predict testing data set.</li>
+</ol>
+<pre class="r"><code>testPre &lt;- predict (modFit, test2)
+testPre</code></pre>
+<pre><code>##  [1] B A B A A E D B A A B C B A E E A B B B
+## Levels: A B C D E</code></pre>
+<pre class="r"><code>summary(testPre)</code></pre>
+<pre><code>## A B C D E 
+## 7 8 1 1 3</code></pre>
+<p>According to result, the 20 cases, 7 are class A, 8 are class B, 1 is class C, 1 is class D, 3 are class E.</p>
 </div>
 
 

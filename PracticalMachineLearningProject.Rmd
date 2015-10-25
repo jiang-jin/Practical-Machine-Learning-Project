@@ -18,6 +18,7 @@ setwd ("~/Desktop/WorkDirectory/Practical-Machine-Learning-Project")
 library(caret)
 library(rpart)
 library(randomForest)
+library(rattle)
 # load data
 training <- read.csv("./data/pml-training.csv", row.names=1)
 dim (training)
@@ -71,8 +72,8 @@ library(caret)
 modFit <- train(classe ~., method="rf", data=train, trControl=trainControl(method='cv'), number=5, allowParallel=TRUE )
 print (modFit$finalModel)
 
-# library(rattle)
-# fancyRpartPlot (modFit$finalModel)
+library(rattle)
+fancyRpartPlot (modFit$finalModel)
 
 ```
 
@@ -101,6 +102,8 @@ testPre
 summary(testPre)
 
 ```
+
+# Result:
 According to result, the 20 cases, 7 are class A, 8 are class B, 1 is class C, 1 is class D, 3 are class E.
 
 
