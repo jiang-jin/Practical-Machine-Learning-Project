@@ -106,12 +106,14 @@ According to result, the 20 cases, 7 are class A, 8 are class B, 1 is class C, 1
 
 # Appendix:
 # plot desition tree
+
+```{r}
+
 modFit2 <- rpart(classe ~ ., data=train, method="class")
 library(rattle)
 fancyRpartPlot(modFit2)
 
-
-
+```
 
 
 

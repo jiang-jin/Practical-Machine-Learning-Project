@@ -130,10 +130,10 @@ print (modFit$finalModel)</code></pre>
 ## Confusion matrix:
 ##      A    B    C    D    E  class.error
 ## A 3348    0    0    0    0 0.0000000000
-## B    0 2277    2    0    0 0.0008775779
-## C    0    0 2053    1    0 0.0004868549
-## D    0    0    2 1925    3 0.0025906736
-## E    0    0    0    3 2162 0.0013856813</code></pre>
+## B    3 2275    1    0    0 0.0017551558
+## C    0    3 2049    2    0 0.0024342746
+## D    0    0    1 1929    0 0.0005181347
+## E    0    0    0    1 2164 0.0004618938</code></pre>
 <p>Accuracy: Compute accuracy in training set and cross validation set.</p>
 <pre class="r"><code># train set
 trainPre &lt;- predict(modFit, train)
@@ -178,33 +178,33 @@ Matrix2</code></pre>
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 2232    1    0    0    0
-##          B    0 1517    3    0    0
-##          C    0    0 1363    2    0
-##          D    0    0    2 1284    1
-##          E    0    0    0    0 1441
+##          A 2232    0    0    0    0
+##          B    0 1516    1    0    0
+##          C    0    2 1367    0    0
+##          D    0    0    0 1285    1
+##          E    0    0    0    1 1441
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.9989          
-##                  95% CI : (0.9978, 0.9995)
+##                Accuracy : 0.9994          
+##                  95% CI : (0.9985, 0.9998)
 ##     No Information Rate : 0.2845          
 ##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
 ##                                           
-##                   Kappa : 0.9985          
+##                   Kappa : 0.9992          
 ##  Mcnemar's Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            1.0000   0.9993   0.9963   0.9984   0.9993
-## Specificity            0.9998   0.9995   0.9997   0.9995   1.0000
-## Pos Pred Value         0.9996   0.9980   0.9985   0.9977   1.0000
-## Neg Pred Value         1.0000   0.9998   0.9992   0.9997   0.9998
+## Sensitivity            1.0000   0.9987   0.9993   0.9992   0.9993
+## Specificity            1.0000   0.9998   0.9997   0.9998   0.9998
+## Pos Pred Value         1.0000   0.9993   0.9985   0.9992   0.9993
+## Neg Pred Value         1.0000   0.9997   0.9998   0.9998   0.9998
 ## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
-## Detection Rate         0.2845   0.1933   0.1737   0.1637   0.1837
-## Detection Prevalence   0.2846   0.1937   0.1740   0.1640   0.1837
-## Balanced Accuracy      0.9999   0.9994   0.9980   0.9990   0.9997</code></pre>
+## Detection Rate         0.2845   0.1932   0.1742   0.1638   0.1837
+## Detection Prevalence   0.2845   0.1933   0.1745   0.1639   0.1838
+## Balanced Accuracy      1.0000   0.9993   0.9995   0.9995   0.9996</code></pre>
 <p>From the tet we can see the accuracy in training set is 1, P-value &lt;0.05. Accuracy in cross validation set is 0.997, P-value &lt;0.05. The accuracy is very high in method “rf”.</p>
 </div>
 <div id="tests-prediction" class="section level1">
@@ -221,6 +221,13 @@ testPre</code></pre>
 <div id="result" class="section level1">
 <h1>Result:</h1>
 <p>According to result, the 20 cases, 7 are class A, 8 are class B, 1 is class C, 1 is class D, 3 are class E.</p>
+</div>
+<div id="appendix" class="section level1">
+<h1>Appendix:</h1>
+</div>
+<div id="plot-desition-tree" class="section level1">
+<h1>plot desition tree</h1>
+<p>modFit2 &lt;- rpart(classe ~ ., data=train, method=“class”) library(rattle) fancyRpartPlot(modFit2)</p>
 </div>
 
 
